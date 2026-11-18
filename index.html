@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101311" />
+    <meta name="description" content="끝난 대국을 불러와 수를 되짚고, 브라우저에서 체스 엔진으로 복기하는 공간." />
+    <title>something_chess — 복기 연구실</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="something chess 홈">
+          <span class="brand-mark" aria-hidden="true">♞</span>
+          <span>something<span class="brand-accent">_chess</span></span>
+        </a>
+        <div class="topbar-right">
+          <span class="study-pill"><span class="pulse"></span> POST-GAME STUDY</span>
+          <a class="github-link" href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub 저장소">↗</a>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="intro">
+          <div>
+            <p class="eyebrow">THE QUIET ADVANTAGE · 복기 연구실</p>
+            <h1>한 수씩 돌아보고,<br /><span>다음을 더 깊게.</span></h1>
+          </div>
+          <p class="intro-copy">끝난 대국을 불러와 중요한 순간을 천천히 살펴보세요.<br />분석은 이 보드 안에서만 진행됩니다.</p>
+        </section>
+
+        <section class="workspace" aria-label="체스 복기 공간">
+          <aside class="left-panel panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">YOUR STUDY</p>
+                <h2>복기 노트</h2>
+              </div>
+              <button class="icon-button" id="newGameButton" title="새 보드" aria-label="새 보드">＋</button>
+            </div>
+
+            <div class="game-card">
+              <div class="game-card-top"><span class="game-dot"></span><span id="gameLabel">연습 대국</span><span class="game-date">DEMO</span></div>
+              <div class="players">
+                <div class="player-row"><span class="player-avatar white-avatar">♙</span><span><strong>White</strong><small>복기 중</small></span><b class="player-score">—</b></div>
+                <div class="player-row"><span class="player-avatar black-avatar">♟</span><span><strong>Black</strong><small>복기 중</small></span><b class="player-score">—</b></div>
+              </div>
+              <div class="game-meta"><span>♙ <span id="moveCount">0</span>수</span><span>⏱ 자유 분석</span></div>
+            </div>
+
+            <div class="moves-heading"><span>수순</span><span id="moveProgress">시작 포지션</span></div>
+            <div class="move-list" id="moveList" aria-label="대국 수순"></div>
+            <div class="left-actions">
+              <button class="subtle-button" id="loadPgnButton"><span>⇧</span> PGN 불러오기</button>
+              <button class="subtle-button" id="loadFenButton"><span>⌗</span> FEN 포지션</button>
+            </div>
+            <p class="privacy-note"><span>◉</span> 분석은 내 브라우저에서 실행돼요.</p>
+          </aside>
+
+          <section class="board-area">
+            <div class="board-title-row">
+              <div><span class="live-dot"></span><span id="positionLabel">시작 포지션</span></div>
+              <button class="flip-button" id="flipButton" aria-label="보드 뒤집기" title="보드 뒤집기">⤾ <span>보드 뒤집기</span></button>
+            </div>
+            <div class="board-frame">
+              <div class="rank-labels" id="rankLabels" aria-hidden="true"></div>
+              <div class="chessboard" id="chessboard" role="grid" aria-label="체스 보드"></div>
+              <div class="file-labels" id="fileLabels" aria-hidden="true"></div>
+            </div>
+            <div class="board-controls">
+              <div class="nav-controls">
+                <button class="nav-button" id="firstMove" aria-label="처음으로" title="처음으로">|◀</button>
+                <button class="nav-button" id="previousMove" aria-label="이전 수" title="이전 수">◀</button>
+                <button class="nav-button primary-nav" id="nextMove" aria-label="다음 수" title="다음 수">▶</button>
+                <button class="nav-button" id="lastMove" aria-label="마지막 수" title="마지막 수">▶|</button>
+              </div>
+              <button class="clear-button" id="clearHighlights">표시 지우기</button>
+            </div>
+            <div class="board-hint"><span>TIP</span> 기물을 선택한 뒤 칸을 눌러 수를 탐색하세요.</div>
+          </section>
+
+          <aside class="analysis-panel panel">
+            <div class="panel-heading analysis-heading">
+              <div><p class="eyebrow">ENGINE ROOM</p><h2>포지션 분석</h2></div>
+              <span class="engine-badge"><span class="engine-light" id="engineLight"></span> STOCKFISH</span>
+            </div>
+
+            <div class="eval-card">
+              <div class="eval-top"><span>평가 · 백 기준</span><span id="evalText">—</span></div>
+              <div class="eval-track"><div class="eval-white" id="evalBar"></div></div>
+              <div class="eval-scale"><span>−</span><span>0</span><span>+</span></div>
+            </div>
+
+            <div class="best-move-card">
+              <div class="best-move-label"><span class="spark">✳</span> BEST MOVE <span class="depth-tag" id="depthTag">DEPTH —</span></div>
+              <div class="best-move-value" id="bestMove">분석을 시작해보세요</div>
+              <p class="best-move-note" id="bestMoveNote">끝난 대국 또는 연습 포지션을 분석합니다.</p>
+            </div>
+
+            <div class="analysis-lines-heading"><span>추천 수순</span><span>평가</span></div>
+            <div class="analysis-lines" id="analysisLines">
+              <div class="empty-line"><span>—</span><span>분석 대기 중</span></div>
+              <div class="empty-line"><span>—</span><span>분석 대기 중</span></div>
+              <div class="empty-line"><span>—</span><span>분석 대기 중</span></div>
+            </div>
+
+            <div class="depth-control">
+              <label for="depthSelect">분석 깊이 <span id="depthValue">14 ply</span></label>
+              <input id="depthSelect" type="range" min="10" max="18" step="2" value="14" />
+              <div class="range-hints"><span>빠르게</span><span>깊게</span></div>
+            </div>
+
+            <button class="analyze-button" id="analyzeButton"><span class="analyze-icon">✳</span><span id="analyzeButtonText">이 포지션 분석</span><span class="button-arrow">→</span></button>
+            <p class="engine-footnote" id="engineStatus">엔진을 불러오면 분석이 시작됩니다.</p>
+          </aside>
+        </section>
+
+        <footer class="page-footer">
+          <span>something_chess <span class="footer-separator">/</span> 천천히 두고, 깊게 복기하기.</span>
+          <span class="fair-play">♙ &nbsp; 대국이 끝난 뒤 분석용으로 사용해 주세요.</span>
+        </footer>
+      </main>
+    </div>
+
+    <dialog class="import-dialog" id="importDialog">
+      <form method="dialog" class="dialog-shell">
+        <div class="dialog-heading"><div><p class="eyebrow" id="dialogEyebrow">IMPORT GAME</p><h2 id="dialogTitle">PGN 불러오기</h2></div><button class="icon-button close-dialog" aria-label="닫기">×</button></div>
+        <p class="dialog-description" id="dialogDescription">끝난 대국의 PGN 텍스트를 붙여 넣으세요.</p>
+        <textarea id="importText" spellcheck="false" placeholder="[Event &quot;Casual Game&quot;]&#10;1. e4 e5 2. Nf3 Nc6 ..."></textarea>
+        <p class="dialog-error" id="dialogError" role="alert"></p>
+        <div class="dialog-actions"><button class="dialog-cancel" value="cancel">취소</button><button class="dialog-submit" id="importSubmit" value="default">불러오기 <span>→</span></button></div>
+      </form>
+    </dialog>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
